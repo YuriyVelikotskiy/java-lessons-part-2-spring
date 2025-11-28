@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static application.controller.ControllerHandler.tryUpdate;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -20,13 +22,13 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}")
-    public UserResponse getUserById(@PathVariable Integer userId) {
-        return userService.findById(userId);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer userId) {
+        return tryUpdate(() -> userService.findById(userId));
     }
 
     @PostMapping("/users")
-    public UserResponse saveUser(@RequestBody UserRequest user) {
-        return userService.saveUser(user);
+    public ResponseEntity<UserResponse> saveUser(@RequestBody UserRequest user) {
+        return tryUpdate(() -> userService.saveUser(user));
     }
 
     @DeleteMapping("/users/{userId}")
@@ -36,12 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest user){
-        try {
-            UserResponse updatedUser = userService.update(user);
-            return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest user) {
+        return tryUpdate(() -> userService.update(user));
     }
 }

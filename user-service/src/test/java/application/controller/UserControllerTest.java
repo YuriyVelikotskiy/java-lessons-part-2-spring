@@ -39,7 +39,7 @@ class UserControllerTest {
     @BeforeAll
     static void init() {
         objectMapper = new ObjectMapper();
-        user = new UserRequest("Test", "test@test.ru", 20);
+        user = new UserRequest(null,"Test", "test@test.ru", 20);
         firstUser = new UserResponse("Test", "test@test.ru", 20, LocalDate.of(2000, 1, 1));
         secondUser = new UserResponse("TEST", "TEST@test.ru", 40, LocalDate.of(2020, 1, 1));
     }
@@ -65,8 +65,8 @@ class UserControllerTest {
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.[0].name").value(firstUser.getName()))
-                .andExpect(jsonPath("$.[1].name").value(secondUser.getName()));
+                .andExpect(jsonPath("$.[0].name").value(firstUser.name()))
+                .andExpect(jsonPath("$.[1].name").value(secondUser.name()));
         verify(service).getAll();
     }
 
@@ -79,24 +79,24 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(firstUser.getName()))
-                .andExpect(jsonPath("$.age").value(firstUser.getAge()))
-                .andExpect(jsonPath("$.email").value(firstUser.getEmail()));
+                .andExpect(jsonPath("$.name").value(firstUser.name()))
+                .andExpect(jsonPath("$.age").value(firstUser.age()))
+                .andExpect(jsonPath("$.email").value(firstUser.email()));
         verify(service).saveUser(any(UserRequest.class));
     }
 
     @Test
     @DisplayName("Метод должен обновить запись")
-    void updateUser_Success() throws Exception {
+    void shouldBeUpdated() throws Exception {
         when(service.update(any(UserRequest.class))).thenReturn(firstUser);
 
         mockMvc.perform(put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(firstUser.getName()))
-                .andExpect(jsonPath("$.age").value(firstUser.getAge()))
-                .andExpect(jsonPath("$.email").value(firstUser.getEmail()));
+                .andExpect(jsonPath("$.name").value(firstUser.name()))
+                .andExpect(jsonPath("$.age").value(firstUser.age()))
+                .andExpect(jsonPath("$.email").value(firstUser.email()));
         verify(service).update(any(UserRequest.class));
     }
 

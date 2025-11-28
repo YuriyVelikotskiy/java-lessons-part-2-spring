@@ -59,9 +59,8 @@ class UserServiceTest {
 
         userResponse = new UserResponse(name, email, age, creatDate);
         userResponseForUpdate = new UserResponse(updatedName, email, age, creatDate);
-        userRequestForSave = new UserRequest(name, email, age);
-        userRequestForUpdate = new UserRequest(name, email, age);
-        userRequestForUpdate.setId(userId);
+        userRequestForSave = new UserRequest(null, name, email, age);
+        userRequestForUpdate = new UserRequest(userId, name, email, age);
     }
 
     @Test
