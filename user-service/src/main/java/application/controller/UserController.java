@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static application.controller.ControllerHandler.tryUpdate;
+import static application.controller.ControllerHandler.tryDelete;
+import static application.controller.ControllerHandler.tryRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,22 +24,21 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Integer userId) {
-        return tryUpdate(() -> userService.findById(userId));
+        return tryRequest(() -> userService.findById(userId));
     }
 
     @PostMapping("/users")
     public ResponseEntity<UserResponse> saveUser(@RequestBody UserRequest user) {
-        return tryUpdate(() -> userService.saveUser(user));
+        return tryRequest(() -> userService.saveUser(user));
     }
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer userId) {
-        userService.delete(userId);
-        return ResponseEntity.ok("Todo deleted successfully!.");
+        return tryDelete(()->userService.delete(userId));
     }
 
     @PutMapping("/users")
     public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest user) {
-        return tryUpdate(() -> userService.update(user));
+        return tryRequest(() -> userService.update(user));
     }
 }
