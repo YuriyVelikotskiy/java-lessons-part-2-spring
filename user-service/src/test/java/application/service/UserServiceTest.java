@@ -111,7 +111,9 @@ class UserServiceTest {
     @Test
     @DisplayName("Удаление записи")
     void shouldBeDelete() {
+        when(mockRepository.findById(1)).thenReturn(Optional.ofNullable(user));
         doNothing().when(mockRepository).deleteById(1);
+
 
         service.delete(1);
 
