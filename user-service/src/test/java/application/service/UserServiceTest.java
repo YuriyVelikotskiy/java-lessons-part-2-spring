@@ -57,8 +57,8 @@ class UserServiceTest {
         updatedUser.setAge(age);
         updatedUser.setCreated_at(creatDate);
 
-        userResponse = new UserResponse(name, email, age, creatDate);
-        userResponseForUpdate = new UserResponse(updatedName, email, age, creatDate);
+        userResponse = new UserResponse(1,name, email, age, creatDate);
+        userResponseForUpdate = new UserResponse(1,updatedName, email, age, creatDate);
         userRequestForSave = new UserRequest(null, name, email, age);
         userRequestForUpdate = new UserRequest(userId, name, email, age);
     }

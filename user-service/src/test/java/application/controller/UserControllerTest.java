@@ -8,14 +8,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
@@ -35,13 +35,15 @@ class UserControllerTest {
     private static ObjectMapper objectMapper;
     @MockitoBean
     private UserService service;
+    @MockitoBean
+    private ModelAssembler assembler;
 
     @BeforeAll
     static void init() {
         objectMapper = new ObjectMapper();
         user = new UserRequest(null,"Test", "test@test.ru", 20);
-        firstUser = new UserResponse("Test", "test@test.ru", 20, LocalDate.of(2000, 1, 1));
-        secondUser = new UserResponse("TEST", "TEST@test.ru", 40, LocalDate.of(2020, 1, 1));
+        firstUser = new UserResponse(0,"Test", "test@test.ru", 20, LocalDate.of(2000, 1, 1));
+        secondUser = new UserResponse(0,"TEST", "TEST@test.ru", 40, LocalDate.of(2020, 1, 1));
     }
 
     @Test
@@ -49,6 +51,7 @@ class UserControllerTest {
     void shouldReturnUserById() throws Exception {
         Integer userId = 1;
         when(service.findById(userId)).thenReturn(firstUser);
+        when(assembler.toModel(firstUser)).thenReturn(EntityModel.of(firstUser));
 
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
@@ -60,13 +63,15 @@ class UserControllerTest {
     @DisplayName("Метод должен вернуть List")
     void shouldReturnListOfUsers() throws Exception {
         List<UserResponse> list = List.of(firstUser, secondUser);
+        List<EntityModel<UserResponse>> mappedList = list.stream().map(EntityModel::of).toList();
         when(service.getAll()).thenReturn(list);
+        when(assembler.toCollectionModel(list)).thenReturn(CollectionModel.of(mappedList));
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.[0].name").value(firstUser.name()))
-                .andExpect(jsonPath("$.[1].name").value(secondUser.name()));
+                .andExpect(jsonPath("$._embedded.userResponseList.length()").value(2))
+                .andExpect(jsonPath("$._embedded.userResponseList[0].name").value(firstUser.name()))
+                .andExpect(jsonPath("$._embedded.userResponseList[1].name").value(secondUser.name()));
         verify(service).getAll();
     }
 
@@ -74,11 +79,11 @@ class UserControllerTest {
     @DisplayName("Метод должен вернуть новую запись")
     void shouldCreateUser() throws Exception {
         when(service.saveUser(any(UserRequest.class))).thenReturn(firstUser);
-
-        mockMvc.perform(post("/users")
+        when(assembler.toModel(firstUser)).thenReturn(EntityModel.of(firstUser));
+        mockMvc.perform(post("/user")
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().is(201))
                 .andExpect(jsonPath("$.name").value(firstUser.name()))
                 .andExpect(jsonPath("$.age").value(firstUser.age()))
                 .andExpect(jsonPath("$.email").value(firstUser.email()));
@@ -89,8 +94,8 @@ class UserControllerTest {
     @DisplayName("Метод должен обновить запись")
     void shouldBeUpdated() throws Exception {
         when(service.update(any(UserRequest.class))).thenReturn(firstUser);
-
-        mockMvc.perform(put("/users")
+        when(assembler.toModel(firstUser)).thenReturn(EntityModel.of(firstUser));
+        mockMvc.perform(put("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
@@ -106,7 +111,7 @@ class UserControllerTest {
 
         doNothing().when(service).delete(1);
 
-        mockMvc.perform(delete("/users/1")).andExpect(status().isOk());
+        mockMvc.perform(delete("/users/1")).andExpect(status().is(204));
 
         verify(service).delete(1);
     }
