@@ -1,0 +1,28 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: notification-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic:
+      actions: actions
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8889/eureka
