@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static application.controller.ControllerHandler.trySend;
-
 @RestController
 public class NotificationController {
 
@@ -17,6 +15,11 @@ public class NotificationController {
 
     @PostMapping("/notification/send")
     public ResponseEntity<EmailMessage> notification (@RequestBody NotificationMessage message){
-        return trySend(()->notificationService.sendNotification(message));
+        try {
+            notificationService.sendNotification(message);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
