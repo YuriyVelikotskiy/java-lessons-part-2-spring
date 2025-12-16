@@ -1,0 +1,46 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: user-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic:
+      actions: actions
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+
+  datasource:
+    url: jdbc:postgresql://localhost:8081/postgres
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    change-log: classpath:db/changelog.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8889/eureka
+
+resilience4j.circuitbreaker:
+  instances:
+    myServiceBreaker:
+      slidingWindowSize: 10
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10s
+      permittedNumberOfCallsInHalfOpenState: 3
+      minimumNumberOfCalls: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
