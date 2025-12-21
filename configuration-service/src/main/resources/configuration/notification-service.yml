@@ -1,11 +1,11 @@
 server:
-  port: 0
+  port: 8883
 
 spring:
   application:
     name: notification-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA:localhost:9092}
     topic:
       actions: actions
     consumer:
@@ -25,4 +25,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8889/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8889/eureka/}

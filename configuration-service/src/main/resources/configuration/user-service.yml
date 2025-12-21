@@ -1,12 +1,12 @@
 server:
-  port: 0
+  port: 8882
 
 spring:
   application:
     name: user-service
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA:localhost:9092}
     topic:
       actions: actions
     consumer:
@@ -14,13 +14,10 @@ spring:
       auto-offset-reset: earliest
 
   datasource:
-    url: jdbc:postgresql://localhost:8081/postgres
-    username: test
-    password: test
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${SERVER_PORT:8081}/${POSTGRES_DB:postgres}
+    username: ${POSTGRES_USERNAME:test}
+    password: ${POSTGRES_PASSWORD:test}
     driver-class-name: org.postgresql.Driver
-
-  liquibase:
-    change-log: classpath:db/changelog.yml
 
   jpa:
     hibernate:
@@ -33,7 +30,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8889/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8889/eureka/}
 
 resilience4j.circuitbreaker:
   instances:

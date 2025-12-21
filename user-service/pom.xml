@@ -99,11 +99,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-        <!--liquibase-->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
         <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
