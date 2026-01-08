@@ -3,11 +3,11 @@ server:
 
 spring:
   application:
-    name: eureka-service
+    name: discovery-service
 
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://localhost:8889/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8889/eureka}
